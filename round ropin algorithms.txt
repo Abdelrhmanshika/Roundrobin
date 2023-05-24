@@ -1,0 +1,135 @@
+#include<iostream>
+#include<iomanip>
+#include<vector>
+using namespace std;
+
+FINAL LAB PROJECT REPORT
+
+OPERATING SYSTEM I
+LEVEL 2
+struct process {
+ int burst_time;
+ int waiting_time;
+ int remaining_time;
+ int arrival_time;
+ int id;
+};
+// method to print Gantt Chart
+void printGanttChart(const vector<int>& processIds, const vector<int>& executionTimes) {
+ cout << "--------------------------------------------------------------------------" << endl;
+ cout << "|";
+ for (int i = 0; i < processIds.size(); i++) {
+ cout << " P" << processIds[i] << " |";
+ }
+ cout << endl;
+ cout << "--------------------------------------------------------------------------" << endl;
+ cout << "0";
+ for (int i = 0; i < executionTimes.size(); i++) {
+ cout << setw(8) << executionTimes[i];
+ }
+ cout << endl;
+}
+int main() {
+
+ cout <<"Hello Dr. Amira"<<endl;
+ int quantum, numofprocess;
+ // input number of process
+ cout << "\nEnter the number of processes: ";
+ cin >> numofprocess;
+ // vector it's like a dynamic array to store any number of process
+ vector<process> arr(numofprocess);
+ // create input table
+ cout << "\n======================================="<<endl;
+ cout << " INPUT TABLE "<<endl;
+ cout << "======================================="<<endl;
+ cout << "---------------------------------------"<<endl;
+ cout << "| Process | Arrival Time | Burst Time |"<<endl;
+ cout << "---------------------------------------"<<endl;
+
+for (int i = 0; i < numofprocess; i++) {
+ arr[i].id = i + 1;
+ cout << " P" << arr[i].id << "\t\t";
+ cin >> arr[i].arrival_time >> arr[i].burst_time;
+ arr[i].remaining_time = arr[i].burst_time;
+ }
+ cout << "---------------------------------------";
+
+ cout << "\n Enter the time quantum: ";
+ cin >> quantum;
+ cout<< "---------------------------------------"<<endl;
+ // Bubble sort to sorting process from minimum to maximum Arrival Time
+ process temp;
+ for (int i = 0; i < numofprocess - 1; i++) {
+ for (int j = i + 1; j < numofprocess; j++) {
+ if (arr[i].arrival_time > arr[j].arrival_time) {
+ temp = arr[i];
+ arr[i] = arr[j];
+ arr[j] = temp;
+ }
+ }
+ }
+ // create output sorted table
+ cout << "\n======================================="<<endl;
+ cout << " SORTED TABLE "<<endl;
+ cout << "======================================="<<endl;
+
+ cout << "---------------------------------------"<<endl;
+ cout << "| Process | Arrival Time | Burst Time |"<<endl;
+ cout << "---------------------------------------"<<endl;
+ for (int j = 0; j < numofprocess; j++){
+ cout<< "| P" << arr[j].id << " | " << arr[j].arrival_time << " | "
+<< arr[j].burst_time << " |" <<endl;
+ cout << "---------------------------------------"<<endl;
+ }
+ // code for Round Robin Algorithm
+ vector<int> processIds;
+ vector<int> executionTimes;
+ int current_time = 0;
+ int completed = 0;
+ while (completed != numofprocess) {
+ for (int i = 0; i < numofprocess; i++) {
+ if (arr[i].remaining_time > 0) {
+ if (arr[i].remaining_time > quantum) {
+ current_time += quantum;
+ arr[i].remaining_time -= quantum;
+ }
+ else {
+ current_time += arr[i].remaining_time;
+ arr[i].waiting_time = current_time - arr[i].arrival_time - arr[i].burst_time;
+ arr[i].remaining_time = 0;
+ completed++;
+ }
+ processIds.push_back(arr[i].id);
+ executionTimes.push_back(current_time);
+ }
+ }
+ }
+
+ // create output result table
+ cout << "\n=========================================================="<<endl;
+ cout << " RESULT TABLE "<<endl;
+ cout << "=========================================================="<<endl;
+
+ cout << "----------------------------------------------------------"<<endl;
+ cout << "| Process | Arrival Time | Burst Time | Waiting Time |"<<endl;
+ cout << "----------------------------------------------------------"<<endl;
+
+ for (int j = 0; j < numofprocess; j++){
+ cout<< "| P" << arr[j].id << " | " << arr[j].arrival_time << "
+| " << arr[j].burst_time << " | " << arr[j].waiting_time << " |" << endl;;
+ cout << "----------------------------------------------------------"<<endl;
+ }
+ // calculate Average Waiting Time
+ int sum = 0;
+ for (int i = 0; i < numofprocess; i++) {
+ sum += arr[i].waiting_time;
+ }
+ cout << "| Average Waiting Time = " << sum << "/" << numofprocess << " = " <<
+(float)sum / numofprocess << " |" << endl;
+ cout << "----------------------------------------------------------"<<endl;
+ // create Gantt Chart
+ cout << "\n==================================================="<<endl;
+ cout << " GANTT CHART "<<endl;
+ cout << "===================================================\n"<<endl;
+ printGanttChart(processIds, executionTimes);
+ return 0;
